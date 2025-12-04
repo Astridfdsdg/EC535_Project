@@ -1,0 +1,7 @@
+Intructions on how to update game:
+
+qmake
+make -j4
+
+chmod +x paddle_ball_bricks_powerups  
+QT_QPA_PLATFORM=linuxfb QT_QPA_FB_HIDECURSOR=1 ./paddle_ball_bricks_powerups
