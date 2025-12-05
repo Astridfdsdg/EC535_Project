@@ -8,7 +8,7 @@
 class GameWidget : public QWidget {
     Q_OBJECT
 public:
-    explicit GameWidget(QWidget* parent=nullptr);
+    explicit GameWidget(int level = 1, QWidget* parent=nullptr);
 
 signals:
     void returnToMenu();
@@ -28,6 +28,8 @@ private:
     void initBricks();
     void resetBall();          // reset balls for a new life
     void grantMultiball();     // create an extra ball
+
+    int m_level = 1;
 
     QTimer        m_timer;        // render/update at ~60 FPS
     QElapsedTimer m_clock;
