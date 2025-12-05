@@ -94,10 +94,8 @@ void GameWidget::initBricks() {
     }
     else if (m_level == 2) {
         // 5 rows, 8 cols. Top rows have a  block of grey bricks
-        // centered, so visually it forms a pyramid:
-        //
-      
-
+        // centered, so visually it forms a pyramid
+        
         int rows = 5;
         int cols = 8;
 
@@ -136,11 +134,7 @@ void GameWidget::initBricks() {
         }
     }
     else { 
-        // 
-        //
         // 6 rows, 8 cols.
-        // Grey "frame" around a colorful interior:
-        
 
         int rows = 6;
         int cols = 8;
