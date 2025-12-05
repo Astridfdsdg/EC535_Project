@@ -183,11 +183,30 @@ void MainMenu::startLevel1() {
 }
 
 void MainMenu::startLevel2() {
+	this->hide();
+    GameWidget* game = new GameWidget(2);   
+    game->showFullScreen();
+
+    connect(game, &GameWidget::returnToMenu, this, [this, game]() {
+        game->hide();
+        this->show();
+        game->deleteLater();
+    });
 }
 
 void MainMenu::startLevel3() {
+	this->hide();
+    GameWidget* game = new GameWidget(3);   
+    game->showFullScreen();
+
+    connect(game, &GameWidget::returnToMenu, this, [this, game]() {
+        game->hide();
+        this->show();
+        game->deleteLater();
+    });
 }
 
 void MainMenu::quitGame() {
     close();
 }
+
