@@ -7,7 +7,10 @@
 #include <cmath>
 #include <cstdlib>
 
-GameWidget::GameWidget(QWidget* parent) : QWidget(parent) {
+GameWidget::GameWidget(int level, QWidget* parent)
+    : QWidget(parent),
+      m_level(level)
+{
     setAttribute(Qt::WA_AcceptTouchEvents, true);
     resetWorld();
     connect(&m_timer, &QTimer::timeout, this, &GameWidget::onTick);
@@ -53,38 +56,121 @@ void GameWidget::resetWorld() {
 void GameWidget::initBricks() {
     m_bricks.clear();
 
-    int rows = 4;
-    int cols = 8;
     float bw = 80;
     float bh = 20;
     float gap = 4;
     float offsetX = 20;
     float offsetY = 60;
 
-    for (int r = 0; r < rows; ++r) {
-        for (int c = 0; c < cols; ++c) {
+    if (m_level == 1) {
+        int rows = 4;
+        int cols = 8;
 
-            float x = offsetX + c * (bw + gap);
-            float y = offsetY + r * (bh + gap);
+        for (int r = 0; r < rows; ++r) {
+            for (int c = 0; c < cols; ++c) {
+                float x = offsetX + c * (bw + gap);
+                float y = offsetY + r * (bh + gap);
 
-            Brick b;
-            b.rect = QRectF(x, y, bw, bh);
+                Brick b;
+                b.rect = QRectF(x, y, bw, bh);
 
-            if (r == 0) {
-                // TOP ROW = strong grey bricks, need 2 hits
-                b.hits  = 2;
-                b.color = QColor(170, 170, 170);   // base grey
-            } else {
-                // normal colorful bricks, 1 hit
-                b.hits  = 1;
-                b.color = QColor::fromHsv(
-                    std::rand() % 360,          // hue
-                    200 + std::rand() % 55,     // saturation
-                    200 + std::rand() % 55      // value (brightness)
-                );
+                if (r == 0) {
+                    // TOP ROW = strong grey bricks, need 2 hits
+                    b.hits  = 2;
+                    b.color = QColor(170, 170, 170);   // base grey
+                } else {
+                    // normal colorful bricks, 1 hit
+                    b.hits  = 1;
+                    b.color = QColor::fromHsv(
+                        std::rand() % 360,          // hue
+                        200 + std::rand() % 55,     // saturation
+                        200 + std::rand() % 55      // value (brightness)
+                    );
+                }
+
+                m_bricks.push_back(b);
             }
+        }
+    }
+    else if (m_level == 2) {
+        // 5 rows, 8 cols. Top rows have a  block of grey bricks
+        // centered, so visually it forms a pyramid:
+        //
+      
 
-            m_bricks.push_back(b);
+        int rows = 5;
+        int cols = 8;
+
+        for (int r = 0; r < rows; ++r) {
+            for (int c = 0; c < cols; ++c) {
+                float x = offsetX + c * (bw + gap);
+                float y = offsetY + r * (bh + gap);
+
+                Brick b;
+                b.rect = QRectF(x, y, bw, bh);
+
+                bool isGrey = false;
+
+                if (r == 0) {
+                    // row 0: grey in columns 2..5
+                    if (c >= 2 && c <= 5) isGrey = true;
+                } else if (r == 1) {
+                    // row 1: grey in columns 1..6 (wider)
+                    if (c >= 1 && c <= 6) isGrey = true;
+                }
+
+                if (isGrey) {
+                    b.hits  = 2;
+                    b.color = QColor(170, 170, 170);
+                } else {
+                    b.hits  = 1;
+                    b.color = QColor::fromHsv(
+                        std::rand() % 360,
+                        200 + std::rand() % 55,
+                        200 + std::rand() % 55
+                    );
+                }
+
+                m_bricks.push_back(b);
+            }
+        }
+    }
+    else { 
+        // 
+        //
+        // 6 rows, 8 cols.
+        // Grey "frame" around a colorful interior:
+        
+
+        int rows = 6;
+        int cols = 8;
+
+        for (int r = 0; r < rows; ++r) {
+            for (int c = 0; c < cols; ++c) {
+                float x = offsetX + c * (bw + gap);
+                float y = offsetY + r * (bh + gap);
+
+                Brick b;
+                b.rect = QRectF(x, y, bw, bh);
+
+                bool isBorder = (r == 0 || r == rows - 1 || c == 0 || c == cols - 1);
+
+                if (isBorder) {
+                    // strong grey frame
+                    b.hits  = 2;
+                    b.color = QColor(170, 170, 170);
+                } else {
+                    // inner colorful bricks
+                    b.hits  = 1;
+                    b.color = QColor::fromHsv(
+                        std::rand() % 360,
+                        200 + std::rand() % 55,
+                        200 + std::rand() % 55
+                    );
+                }
+
+                m_bricks.push_back(b);
+            }
         }
     }
 }
