@@ -318,7 +318,7 @@ void GameWidget::stepPhysics(float dt) {
                             QPointF c = it->rect.center();
                             float w = 30;
                             float h = 14;
-                            m_powerUpRect = QRectF(c.x() - w/2, c.y() - h/2, w, h);
+                            m_powerUpRect = QRectF(c.x() - w/2, c.y() - h/2, w, h); // powerup brick 
                             m_powerUpActive = true; //the powerup turns active
                         }
                     }
