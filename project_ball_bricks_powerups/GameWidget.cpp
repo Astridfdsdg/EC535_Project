@@ -13,10 +13,7 @@ GameWidget::GameWidget(QWidget* parent) : QWidget(parent) {
     connect(&m_timer, &QTimer::timeout, this, &GameWidget::onTick);
     m_timer.start(16);       // ~60 FPS
     m_clock.start();
-
-    
 }
-
 
 void GameWidget::resetBall() {
     m_balls.clear();
@@ -28,6 +25,8 @@ void GameWidget::resetBall() {
 
     m_balls.push_back(b);
 }
+
+
 
 void GameWidget::resetWorld() {
     m_lives = 3;
@@ -72,14 +71,14 @@ void GameWidget::initBricks() {
             b.rect = QRectF(x, y, bw, bh);
 
             if (r == 0) {
-                // TOP ROW = strong grey bricks that need 2 hits to be destroyed
+                // TOP ROW = strong grey bricks, need 2 hits
                 b.hits  = 2;
                 b.color = QColor(170, 170, 170);   // base grey
             } else {
                 // normal colorful bricks, 1 hit
                 b.hits  = 1;
                 b.color = QColor::fromHsv(
-                    std::rand() % 360,          // this is for selecting random color brick values
+                    std::rand() % 360,          // hue
                     200 + std::rand() % 55,     // saturation
                     200 + std::rand() % 55      // value (brightness)
                 );
@@ -134,7 +133,7 @@ void GameWidget::paintEvent(QPaintEvent*) {
         p.drawEllipse(b.pos, m_ballR, m_ballR);
     }
 
-    
+    // ---- HUD ----
     bool anyAttached = false;
     for (const Ball &b : m_balls) {
         if (b.attached) { anyAttached = true; break; }
@@ -152,21 +151,21 @@ void GameWidget::paintEvent(QPaintEvent*) {
         g.setColorAt(1.0, QColor(60, 160, 60));
         p.setBrush(g);
         p.drawRoundedRect(m_powerUpRect, 4, 4);
-        // this is to design the power up blocks , small rectangles with a P or M
+
         p.setPen(Qt::black);
         QString text = (m_powerUpType == PowerType::PaddleSize) ? "P" : "M";
         p.drawText(m_powerUpRect, Qt::AlignCenter, text);
     }
 }
 
-void GameWidget::mouseMoveEvent(QMouseEvent* e) {   // this is when you touch the screen and move paddle
+void GameWidget::mouseMoveEvent(QMouseEvent* e) {
     // convert screen coords to logical coords
     const float sx = m_bounds.width() / width();
     float logicalX = e->x() * sx;
 
     // move paddle horizontally, clamp
     m_paddle.moveCenter(QPointF(logicalX, m_paddle.center().y()));
-    clampPaddle(); // this function allows that the paddle does not move of the screen DO NOT CHANGE
+    clampPaddle();
 
     // keep any attached balls on the paddle
     for (Ball &b : m_balls) {
@@ -176,8 +175,8 @@ void GameWidget::mouseMoveEvent(QMouseEvent* e) {   // this is when you touch th
     }
 }
 
-void GameWidget::mousePressEvent(QMouseEvent*) { // this is when you touch the screen and launch the ball
-    // launch ball when pressed
+void GameWidget::mousePressEvent(QMouseEvent*) {
+    // launch: any attached balls become free
     for (Ball &b : m_balls) {
         b.attached = false;
     }
@@ -189,7 +188,7 @@ void GameWidget::clampPaddle() {
     m_paddle.moveCenter(QPointF(cx, m_paddle.center().y()));
 }
 
-void GameWidget::onTick() {  // DO NOT CHANGE , allows for the dynamics of the game
+void GameWidget::onTick() {
     float frame = m_clock.restart()/1000.f; // seconds
     m_accum += frame;
     while (m_accum >= m_dt) {
@@ -199,7 +198,7 @@ void GameWidget::onTick() {  // DO NOT CHANGE , allows for the dynamics of the g
     update();
 }
 
-void GameWidget::grantMultiball() { //this function creates the second ball when the powerup multiball is catched 
+void GameWidget::grantMultiball() {
     // do not exceed 2 balls
     if (m_balls.size() >= 2) return;
     if (m_balls.empty()) return;
@@ -233,7 +232,7 @@ void GameWidget::stepPhysics(float dt) {
             ball.pos += ball.vel * dt;
         }
 
-        // check colision with walls and bounces back again
+        // walls
         if (ball.pos.x() - m_ballR < 0) {
             ball.pos.setX(m_ballR);
             ball.vel.setX(std::abs(ball.vel.x()));
@@ -249,19 +248,18 @@ void GameWidget::stepPhysics(float dt) {
 
         // bottom (this ball is lost)
         if (ball.pos.y() - m_ballR > m_bounds.height()) {
-            m_balls.erase(m_balls.begin() + i);  // each time a ball is lost one of them if erased (in case you have two balls)
+            m_balls.erase(m_balls.begin() + i);
 
             if (m_balls.empty()) {
                 // life lost only when no balls remain
                 m_lives--;
 
                 if (m_lives <= 0) {
-                    resetWorld(); // if you ran out of lives the world resets
+                    emit returnToMenu();
+                    this->close();
                 } else {
-                    resetBall(); // if you still have lives you continue playing 
-                    
+                    resetBall();
                     // allow power-ups again on new life
-                    
                     m_paddlePowerUsedThisLife = false;
                     m_multiPowerUsedThisLife  = false;
                     m_powerUpActive           = false;
@@ -273,43 +271,43 @@ void GameWidget::stepPhysics(float dt) {
             continue;
         }
 
-        // here we do the actual collision of the ball with the paddle DO NOT CHANGE
+        // paddle collision
         QRectF paddleGrow = m_paddle.adjusted(-m_ballR, -m_ballR, m_ballR, m_ballR);
-        if (paddleGrow.contains(ball.pos) && ball.vel.y() > 0) { // if the paddle collides with a ball
+        if (paddleGrow.contains(ball.pos) && ball.vel.y() > 0) {
             ball.pos.setY(m_paddle.top()-m_ballR-1);
-            ball.vel.setY(-std::abs(ball.vel.y())); // we set the speed on Y
+            ball.vel.setY(-std::abs(ball.vel.y()));
 
             // add spin on x depending on where it hit
             float dx = (ball.pos.x() - m_paddle.center().x()) / (m_paddle.width()/2);
-            ball.vel.setX( std::clamp(dx, -1.f, 1.f) * 320.f ); //we set the speed on X
+            ball.vel.setX( std::clamp(dx, -1.f, 1.f) * 320.f );
         }
 
-        // this is for brick collisions with the ball  (one brick per ball per frame)
+        // brick collisions (one brick per ball per frame)
         for (auto it = m_bricks.begin(); it != m_bricks.end(); ) {
             QRectF grow = it->rect.adjusted(-m_ballR, -m_ballR, m_ballR, m_ballR);
 
-            if (grow.contains(ball.pos)) { // if brick collides with ball 
+            if (grow.contains(ball.pos)) {
                 // bounce
                 ball.vel.setY(-ball.vel.y());
 
-                // decrease hits since grey bricks need 2 hits
+                // decrease hits
                 it->hits--;
 
                 if (it->hits <= 0) {
                     // brick destroyed 
                     bool canDropAny = (!m_paddlePowerUsedThisLife || !m_multiPowerUsedThisLife);
 
-                    if (!m_powerUpActive && canDropAny) {  // 
+                    if (!m_powerUpActive && canDropAny) {
                         int r = std::rand() % 100;  
                         if (r < 20) {               // ~20% chance to drop something
                             // choose type
-                            if (!m_paddlePowerUsedThisLife && !m_multiPowerUsedThisLife) { // if you have not used any of the powerups yet
+                            if (!m_paddlePowerUsedThisLife && !m_multiPowerUsedThisLife) {
                                 // both available → 50/50
                                 if (std::rand() % 2 == 0)
                                     m_powerUpType = PowerType::PaddleSize;
                                 else
                                     m_powerUpType = PowerType::MultiBall;
-                            } else if (!m_paddlePowerUsedThisLife) { 
+                            } else if (!m_paddlePowerUsedThisLife) {
                                 m_powerUpType = PowerType::PaddleSize;
                             } else {
                                 m_powerUpType = PowerType::MultiBall;
@@ -318,16 +316,16 @@ void GameWidget::stepPhysics(float dt) {
                             QPointF c = it->rect.center();
                             float w = 30;
                             float h = 14;
-                            m_powerUpRect = QRectF(c.x() - w/2, c.y() - h/2, w, h); // powerup brick 
-                            m_powerUpActive = true; //the powerup turns active
+                            m_powerUpRect = QRectF(c.x() - w/2, c.y() - h/2, w, h);
+                            m_powerUpActive = true;
                         }
                     }
 
-                    it = m_bricks.erase(it); //you erase the brick collided
+                    it = m_bricks.erase(it);
 
-                    if (m_bricks.empty()) { //when there are no more bricks reset the world
-                        resetWorld();
-                        return;
+                    if (m_bricks.empty()) {
+                        emit returnToMenu();
+                        this->close();
                     }
                 } else {
                     // still alive 
@@ -347,19 +345,19 @@ void GameWidget::stepPhysics(float dt) {
     }
 
     
-    if (m_powerUpActive) { //if one of the powerup blocks is active
+    if (m_powerUpActive) {
         float vy = 80.0f;  // px/s
-        m_powerUpRect.translate(0, vy * dt); // it falls vertically
+        m_powerUpRect.translate(0, vy * dt);
 
-        // this means the paddle did not catch it
+        // missed
         if (m_powerUpRect.top() > m_bounds.height()) {
             m_powerUpActive = false;
         }
         // caught by paddle
         else if (m_powerUpRect.intersects(m_paddle)) {
             if (m_powerUpType == PowerType::PaddleSize) {
-                // increase paddle width if the powerup is the paddle one
-                qreal newW = m_paddle.width() * 1.25; // increase size by 25 percent
+                // increase paddle width
+                qreal newW = m_paddle.width() * 1.25;
                 if (newW > 240) newW = 240;
 
                 qreal h   = m_paddle.height();
@@ -369,13 +367,13 @@ void GameWidget::stepPhysics(float dt) {
                 m_paddle = QRectF(cx - newW/2, cy - h/2, newW, h);
                 clampPaddle();
 
-                m_paddlePowerUsedThisLife = true; // for this life this powerup can no longer appear
-            } else if (m_powerUpType == PowerType::MultiBall) { 
-                grantMultiball(); // the multiball powerup
-                m_multiPowerUsedThisLife = true;// for this life this powerup can no longer appear
+                m_paddlePowerUsedThisLife = true;
+            } else if (m_powerUpType == PowerType::MultiBall) {
+                grantMultiball();
+                m_multiPowerUsedThisLife = true;
             }
 
-            m_powerUpActive = false; //this is false because no more powerups can active for this life
+            m_powerUpActive = false;
         }
     }
 }

@@ -10,6 +10,9 @@ class GameWidget : public QWidget {
 public:
     explicit GameWidget(QWidget* parent=nullptr);
 
+signals:
+    void returnToMenu();
+
 protected:
     void paintEvent(QPaintEvent*) override;
     void mouseMoveEvent(QMouseEvent*) override;   // finger drag
