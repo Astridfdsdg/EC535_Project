@@ -79,7 +79,7 @@ void GameWidget::initBricks() {
                 // normal colorful bricks, 1 hit
                 b.hits  = 1;
                 b.color = QColor::fromHsv(
-                    std::rand() % 360,          // hue
+                    std::rand() % 360,          // this is for selecting random color brick values
                     200 + std::rand() % 55,     // saturation
                     200 + std::rand() % 55      // value (brightness)
                 );
