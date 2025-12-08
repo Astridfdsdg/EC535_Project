@@ -1,6 +1,9 @@
 #include "MainMenu.h"
 #include "GameWidget.h"
+#include "LoseScreen.h"
+#include "WinScreen.h"
 #include <QPainter>
+#include <QApplication>
 #include <QMouseEvent>
 #include <QLinearGradient>
 #include <QPen>
@@ -170,43 +173,64 @@ void MainMenu::onTick() {
 }
 
 void MainMenu::startLevel1() {
-    this->hide();
-    GameWidget* game = new GameWidget();
-    game->setWindowTitle("Brick Breaker");
-    game->showFullScreen();
-
-    connect(game, &GameWidget::returnToMenu, this, [this, game]() {
-        game->hide();  // hide game
-        this->show();  // show menu again
-        game->deleteLater();  // optional, frees memory
-    });
+    startLevel(1);
 }
 
 void MainMenu::startLevel2() {
-	this->hide();
-    GameWidget* game = new GameWidget(2);   
-    game->showFullScreen();
-
-    connect(game, &GameWidget::returnToMenu, this, [this, game]() {
-        game->hide();
-        this->show();
-        game->deleteLater();
-    });
+    startLevel(2);
 }
 
 void MainMenu::startLevel3() {
-	this->hide();
-    GameWidget* game = new GameWidget(3);   
+    startLevel(3);
+}
+
+void MainMenu::startLevel(int level) {
+    this->hide();
+
+    GameWidget* game = new GameWidget(level);
     game->showFullScreen();
 
-    connect(game, &GameWidget::returnToMenu, this, [this, game]() {
+    connect(game, &GameWidget::loseScreen, this, [this, game](int level) {
+
         game->hide();
-        this->show();
         game->deleteLater();
+
+        LoseScreen* lose = new LoseScreen(level, nullptr);
+        lose->showFullScreen();
+
+        connect(lose, &LoseScreen::retryLevel, this, [this, lose](int level){
+            lose->hide();
+            lose->deleteLater();
+            startLevel(level);    // generic startLevel(int) function
+        });
+
+        connect(lose, &LoseScreen::returnToMenu, this, [this, lose](){
+            lose->hide();
+            lose->deleteLater();
+            this->show();         // show MainMenu
+        });
+    });
+
+    connect(game, &GameWidget::winScreen, this, [this, game]() {
+
+        game->hide();
+        game->deleteLater();
+
+        WinScreen* win = new WinScreen(nullptr);
+        win->showFullScreen();
+
+        connect(win, &WinScreen::returnToMenu, this, [this, win](){
+            win->hide();
+            win->deleteLater();
+            this->show();         // show MainMenu
+        });
     });
 }
 
 void MainMenu::quitGame() {
-    close();
+    m_timer.stop();       // stop any running timers
+    this->hide();         // clear the widget from the screen
+    QApplication::processEvents();  // ensure pending paint/hide events complete
+    QApplication::quit();
 }
 

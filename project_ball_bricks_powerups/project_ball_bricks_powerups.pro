@@ -21,6 +21,10 @@ CONFIG += c++17
 
 # Input
 HEADERS += GameWidget.h \
-    MainMenu.h
+    LoseScreen.h \
+    MainMenu.h \
+    WinScreen.h
 SOURCES += GameWidget.cpp main.cpp \
-    MainMenu.cpp
+    LoseScreen.cpp \
+    MainMenu.cpp \
+    WinScreen.cpp

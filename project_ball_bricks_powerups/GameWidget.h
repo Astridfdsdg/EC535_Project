@@ -11,7 +11,8 @@ public:
     explicit GameWidget(int level = 1, QWidget* parent=nullptr);
 
 signals:
-    void returnToMenu();
+    void winScreen();
+    void loseScreen(int level);
 
 protected:
     void paintEvent(QPaintEvent*) override;

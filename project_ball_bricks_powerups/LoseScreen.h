@@ -1,5 +1,5 @@
-#ifndef MAINMENU_H
-#define MAINMENU_H
+#ifndef LOSESCREEN_H
+#define LOSESCREEN_H
 
 #pragma once
 
@@ -8,10 +8,14 @@
 #include <QElapsedTimer>
 #include <vector>
 
-class MainMenu : public QWidget {
+class LoseScreen : public QWidget {
     Q_OBJECT
 public:
-    explicit MainMenu(QWidget* parent=nullptr);
+    explicit LoseScreen(int level = 1, QWidget* parent=nullptr);
+
+signals:
+    void returnToMenu();
+    void retryLevel(int level);
 
 protected:
     void paintEvent(QPaintEvent*) override;
@@ -21,19 +25,15 @@ private slots:
     void onTick();
 
 private:
-    void resetMenu();
-    void startLevel1();
-    void startLevel2();
-    void startLevel3();
-    void startLevel(int level);
-    void quitGame();
+    void resetScreen();
     void initBricks();
+
+    int m_level = 1;
 
     QRectF    m_bounds = QRectF(0, 0, 800, 480);
 
-    QRectF    level1Button;
-    QRectF    level2Button;
-    QRectF    level3Button;
+    QRectF    menuButton;
+    QRectF    retryButton;
     QRectF    quitButton;
 
     QTimer m_timer;
@@ -48,6 +48,4 @@ private:
 
     std::vector<Brick> m_bricks;
 };
-
-
-#endif // MAINMENU_H
+#endif // LOSESCREEN_H

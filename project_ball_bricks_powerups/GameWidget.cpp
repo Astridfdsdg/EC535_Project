@@ -335,8 +335,7 @@ void GameWidget::stepPhysics(float dt) {
                 m_lives--;
 
                 if (m_lives <= 0) {
-                    emit returnToMenu();
-                    this->close();
+                    emit loseScreen(m_level);
                 } else {
                     resetBall();
                     // allow power-ups again on new life
@@ -404,7 +403,7 @@ void GameWidget::stepPhysics(float dt) {
                     it = m_bricks.erase(it);
 
                     if (m_bricks.empty()) {
-                        emit returnToMenu();
+                        emit winScreen();
                         this->close();
                     }
                 } else {
