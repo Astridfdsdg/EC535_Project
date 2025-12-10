@@ -48,7 +48,7 @@ private:
         QPointF vel;
         bool    attached;   // sits on paddle until launch
     };
-    std::vector<Ball> m_balls;
+    std::vector<Ball> m_balls; // vector containing all the balls
     float   m_ballR = 8.f;
 
     //  power-ups 
@@ -73,5 +73,5 @@ private:
         int    hits;   // how many hits remaining
     };
 
-    std::vector<Brick> m_bricks;
+    std::vector<Brick> m_bricks; //vector containing all the bricks
 };
