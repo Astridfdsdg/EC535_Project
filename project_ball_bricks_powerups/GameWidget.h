@@ -26,7 +26,7 @@ private:
     void resetWorld();
     void stepPhysics(float dt);
     void clampPaddle();
-    void initBricks();
+    void initBricks();          //initialize bricks display
     void resetBall();          // reset balls for a new life
     void grantMultiball();     // create an extra ball
 
