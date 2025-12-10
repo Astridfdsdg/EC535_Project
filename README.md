@@ -1,5 +1,6 @@
 # Brick Breaker
 EC535 Project
+
 astridfdsdg and rotuesta
 
 This project implements a multi-level Brick Breaker game on the BeagleBone LCD platform using C++, Qt, and the Linux framebuffer. The system combines real-time graphics, embedded event handling, and custom physics to create an interactive arcade-style application. A dynamic main menu allows players to select between three difficulty levels, each defined by unique brick layouts and ball behaviors. The gameplay engine features paddle control via touchscreen input, precise ball–wall–paddle collision physics, multi-hit bricks, randomized brick colors, and two power-up types: paddle enlargement and multiball. Efficient rendering keeps performance smooth on embedded hardware. The multi-ball system, power-up logic, and game-state transitions were all designed to be modular for future extension. The completed application demonstrates how an embedded device can support responsive graphics, real-time physics simulation, and layered user interfaces, resulting in a fully functional and visually appealing game experience.
