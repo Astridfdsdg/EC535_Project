@@ -352,12 +352,23 @@ void GameWidget::stepPhysics(float dt) {
         // paddle collision
         QRectF paddleGrow = m_paddle.adjusted(-m_ballR, -m_ballR, m_ballR, m_ballR);
         if (paddleGrow.contains(ball.pos) && ball.vel.y() > 0) {
-            ball.pos.setY(m_paddle.top()-m_ballR-1);
+            ball.pos.setY(m_paddle.top()-m_ballR-1); //
             ball.vel.setY(-std::abs(ball.vel.y()));
 
             // add spin on x depending on where it hit
-            float dx = (ball.pos.x() - m_paddle.center().x()) / (m_paddle.width()/2);
-            ball.vel.setX( std::clamp(dx, -1.f, 1.f) * 320.f );
+            float dx = (ball.pos.x() - m_paddle.center().x()) / (m_paddle.width()/2); // dx tells how far left/right the impact was, normalized to [-1, 1]
+            // This scales the direction into an actual velocity value:
+
+            //Hitting center → 0 × 320 = 0 horizontal velocity
+            
+            //Hitting right edge → 1 × 320 = +320 px/s horizontal
+            
+            //Hitting left edge → -1 × 320 = –320 px/s horizontal
+            
+            //Hitting halfway → 0.5 × 320 = 160 px/s
+            
+            //So 320 px/s is the maximum sideways speed.
+            ball.vel.setX( std::clamp(dx, -1.f, 1.f) * 320.f ); 
         }
 
         // brick collisions (one brick per ball per frame)
