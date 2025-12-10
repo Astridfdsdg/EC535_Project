@@ -1,12 +1,12 @@
 Intructions on how to run game:
 
-#qmake creates the .pro file called paddle_ball_bricks_powerups.pro , please look at that .pro file and dont change it since it must be as it is for this game to work
+#qmake creates the .pro file called paddle_ball_bricks_powerups.pro , please look at that .pro file and dont change it since it must be as it is for this game to work:
 qmake -project  
 
-#qmake uses the .pro file to generate the Makefile
+#qmake uses the .pro file to generate the Makefile:
 qmake
 
-#Uses the Makefile to compile the project and creates the binary
+#Use the Makefile to compile the project and create the binary:
 make -j4
 
 #Transfer binary , here paddle_ball_bricks_powerups to the BeagleBone
