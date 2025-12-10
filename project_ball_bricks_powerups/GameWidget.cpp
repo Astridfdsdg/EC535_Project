@@ -261,7 +261,7 @@ void GameWidget::mousePressEvent(QMouseEvent*) {
     }
 }
 
-void GameWidget::clampPaddle() {
+void GameWidget::clampPaddle() { // this clamps the paddle on the frame and avoids it leaving the screen
     const qreal half = m_paddle.width()/2;
     qreal cx = std::clamp<qreal>(m_paddle.center().x(), half, m_bounds.width()-half);
     m_paddle.moveCenter(QPointF(cx, m_paddle.center().y()));
@@ -294,7 +294,7 @@ void GameWidget::grantMultiball() {
 
     Ball extra;
     extra.pos = source->pos;
-    // mirrored X velocity
+    // mirrored X velocity ,same position than the original ball 
     extra.vel = QPointF(-source->vel.x(), source->vel.y());
     extra.attached = false;   // extra ball is flying
 
@@ -434,17 +434,17 @@ void GameWidget::stepPhysics(float dt) {
     }
 
     
-    if (m_powerUpActive) {
+    if (m_powerUpActive) { //if one of the power-ups is active
         float vy = 80.0f;  // px/s
-        m_powerUpRect.translate(0, vy * dt);
+        m_powerUpRect.translate(0, vy * dt); // the power-up brick falls vertically 
 
-        // missed
+        // missed by the paddle
         if (m_powerUpRect.top() > m_bounds.height()) {
             m_powerUpActive = false;
         }
         // caught by paddle
         else if (m_powerUpRect.intersects(m_paddle)) {
-            if (m_powerUpType == PowerType::PaddleSize) {
+            if (m_powerUpType == PowerType::PaddleSize) { // if the power-up is the Paddle one
                 // increase paddle width
                 qreal newW = m_paddle.width() * 1.25;
                 if (newW > 240) newW = 240;
@@ -453,13 +453,13 @@ void GameWidget::stepPhysics(float dt) {
                 qreal cy  = m_paddle.center().y();
                 qreal cx  = m_paddle.center().x();
 
-                m_paddle = QRectF(cx - newW/2, cy - h/2, newW, h);
+                m_paddle = QRectF(cx - newW/2, cy - h/2, newW, h); // new paddle dimensions
                 clampPaddle();
 
-                m_paddlePowerUsedThisLife = true;
-            } else if (m_powerUpType == PowerType::MultiBall) {
+                m_paddlePowerUsedThisLife = true; // the Paddle power-up cannot appear again 
+            } else if (m_powerUpType == PowerType::MultiBall) { // else the power-up is the Multi-Ball one
                 grantMultiball();
-                m_multiPowerUsedThisLife = true;
+                m_multiPowerUsedThisLife = true; //that Multi-Balll power-up cannot appear again
             }
 
             m_powerUpActive = false;
