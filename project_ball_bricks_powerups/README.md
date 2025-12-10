@@ -1,4 +1,4 @@
-Intructions on how to update game:
+Intructions on how to run game:
 
 #qmake creates the .pro file called paddle_ball_bricks_powerups.pro , please look at that .pro file and dont change it since it must be as it is for this game to work
 qmake -project  
