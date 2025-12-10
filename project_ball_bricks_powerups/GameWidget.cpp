@@ -237,7 +237,7 @@ void GameWidget::paintEvent(QPaintEvent*) {
     }
 }
 
-void GameWidget::mouseMoveEvent(QMouseEvent* e) {
+void GameWidget::mouseMoveEvent(QMouseEvent* e) { // this event occurs when we move our finger on the screen
     // convert screen coords to logical coords
     const float sx = m_bounds.width() / width();
     float logicalX = e->x() * sx;
@@ -255,7 +255,7 @@ void GameWidget::mouseMoveEvent(QMouseEvent* e) {
 }
 
 void GameWidget::mousePressEvent(QMouseEvent*) {
-    // launch: any attached balls become free
+    // launch when screen pressed, any attached balls become free
     for (Ball &b : m_balls) {
         b.attached = false;
     }
@@ -350,7 +350,7 @@ void GameWidget::stepPhysics(float dt) {
         }
 
         // paddle collision
-        QRectF paddleGrow = m_paddle.adjusted(-m_ballR, -m_ballR, m_ballR, m_ballR);
+        QRectF paddleGrow = m_paddle.adjusted(-m_ballR, -m_ballR, m_ballR, m_ballR); //we grow the paddle size by the ball radius to check if the ball is inside
         if (paddleGrow.contains(ball.pos) && ball.vel.y() > 0) {
             ball.pos.setY(m_paddle.top()-m_ballR-1); //
             ball.vel.setY(-std::abs(ball.vel.y()));
@@ -373,7 +373,7 @@ void GameWidget::stepPhysics(float dt) {
 
         // brick collisions (one brick per ball per frame)
         for (auto it = m_bricks.begin(); it != m_bricks.end(); ) {
-            QRectF grow = it->rect.adjusted(-m_ballR, -m_ballR, m_ballR, m_ballR);
+            QRectF grow = it->rect.adjusted(-m_ballR, -m_ballR, m_ballR, m_ballR); //same logic than for the paddle 
 
             if (grow.contains(ball.pos)) {
                 // bounce
