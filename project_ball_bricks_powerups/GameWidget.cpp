@@ -213,7 +213,6 @@ void GameWidget::paintEvent(QPaintEvent*) {
         p.drawEllipse(b.pos, m_ballR, m_ballR);
     }
 
-    // ---- HUD ----
     bool anyAttached = false;
     for (const Ball &b : m_balls) {
         if (b.attached) { anyAttached = true; break; }
