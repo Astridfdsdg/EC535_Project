@@ -11,5 +11,6 @@ make -j4
 
 #Transfer binary , here paddle_ball_bricks_powerups to the BeagleBone
 #In BeagleBone after transfering:
+
 chmod +x paddle_ball_bricks_powerups  
 QT_QPA_PLATFORM=linuxfb QT_QPA_FB_HIDECURSOR=1 ./paddle_ball_bricks_powerups
