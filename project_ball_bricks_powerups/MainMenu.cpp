@@ -13,7 +13,7 @@ MainMenu::MainMenu(QWidget* parent) : QWidget(parent) {
     setAttribute(Qt::WA_AcceptTouchEvents, true);
     connect(&m_timer, &QTimer::timeout, this, &MainMenu::onTick);
     resetMenu();
-    m_timer.start(16);
+    m_timer.start(16); //~60 fps
     m_clock.start();
 }
 
@@ -40,13 +40,13 @@ void MainMenu::initBricks() {
             float x = offsetX + c * (bw + gap);
             float y = offsetY + r * (bh + gap);
 
-            int baseHue = (index * 360) / total;
+            int baseHue = (index * 360) / total; //ordered colors for rainbow 
 
             Brick b;
             b.rect = QRectF(x, y, bw, bh);
             b.baseHue = baseHue;
 
-            b.color = QColor::fromHsv(baseHue, 255, 255);
+            b.color = QColor::fromHsv(baseHue, 255, 255); //max saturation and brightness
 
             m_bricks.push_back(b);
             index++;
@@ -81,7 +81,7 @@ void MainMenu::paintEvent(QPaintEvent*) {
     float tcx = (width() - tbw) / 2;
     float titleY = (height() / 2) - 87;
 
-    QRectF titleBox(tcx, titleY , tbw, tbh);
+    QRectF titleBox(tcx, titleY , tbw, tbh); //title rectangle
 
     const int bw = 120;
     const int bh = 28;
@@ -90,7 +90,7 @@ void MainMenu::paintEvent(QPaintEvent*) {
     float cx = (width() - bw) / 2;
     float firstY = titleBox.bottom() + 40;
 
-    level1Button = QRectF(cx, firstY + 0*(bh + gap), bw, bh);
+    level1Button = QRectF(cx, firstY + 0*(bh + gap), bw, bh); //button rectangles
     level2Button = QRectF(cx, firstY + 1*(bh + gap), bw, bh);
     level3Button = QRectF(cx, firstY + 2*(bh + gap), bw, bh);
     quitButton   = QRectF(cx, firstY + 3*(bh + gap), bw, bh);
@@ -127,7 +127,7 @@ void MainMenu::paintEvent(QPaintEvent*) {
     p.drawText(quitButton,   Qt::AlignCenter, "Quit");
 }
 
-void MainMenu::mousePressEvent(QMouseEvent* event) {
+void MainMenu::mousePressEvent(QMouseEvent* event) { //checking for button presses
     {
         QPointF pos = event->localPos();
 
@@ -145,7 +145,7 @@ void MainMenu::mousePressEvent(QMouseEvent* event) {
         }
         if (quitButton.contains(pos)) {
             quitGame(); 
-	    return;
+	    	return;
         }
     }
 }
@@ -190,28 +190,28 @@ void MainMenu::startLevel(int level) {
     GameWidget* game = new GameWidget(level);
     game->showFullScreen();
 
-    connect(game, &GameWidget::loseScreen, this, [this, game](int level) {
+    connect(game, &GameWidget::loseScreen, this, [this, game](int level) { //connect this widget to GameWidget::loseScreen() signal
 
-        game->hide();
+        game->hide(); //on receiving the signal, hide the game
         game->deleteLater();
 
         LoseScreen* lose = new LoseScreen(level, nullptr);
         lose->showFullScreen();
 
-        connect(lose, &LoseScreen::retryLevel, this, [this, lose](int level){
-            lose->hide();
+        connect(lose, &LoseScreen::retryLevel, this, [this, lose](int level){ //connect this widget to LoseScreen::retryLevel() signal
+            lose->hide();	// hide the lose screen
             lose->deleteLater();
-            startLevel(level);    // generic startLevel(int) function
+            startLevel(level);    // restart the level
         });
 
-        connect(lose, &LoseScreen::returnToMenu, this, [this, lose](){
+        connect(lose, &LoseScreen::returnToMenu, this, [this, lose](){ //connect this widget to LoseScreen::returnToMenu signal
             lose->hide();
             lose->deleteLater();
             this->show();         // show MainMenu
         });
     });
 
-    connect(game, &GameWidget::winScreen, this, [this, game]() {
+    connect(game, &GameWidget::winScreen, this, [this, game]() { //connect this widget to GameWidget::winScreen() signal
 
         game->hide();
         game->deleteLater();
@@ -219,7 +219,7 @@ void MainMenu::startLevel(int level) {
         WinScreen* win = new WinScreen(nullptr);
         win->showFullScreen();
 
-        connect(win, &WinScreen::returnToMenu, this, [this, win](){
+        connect(win, &WinScreen::returnToMenu, this, [this, win](){ //connect this widget to WinScreen::returnToMenu signal
             win->hide();
             win->deleteLater();
             this->show();         // show MainMenu
@@ -233,4 +233,5 @@ void MainMenu::quitGame() {
     QApplication::processEvents();  // ensure pending paint/hide events complete
     QApplication::quit();
 }
+
 
