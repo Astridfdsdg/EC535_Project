@@ -10,7 +10,7 @@ WinScreen::WinScreen(QWidget* parent) : QWidget(parent) {
     setAttribute(Qt::WA_AcceptTouchEvents, true);
     connect(&m_timer, &QTimer::timeout, this, &WinScreen::onTick);
     resetScreen();
-    m_timer.start(16);
+    m_timer.start(16); //~60 fps
     m_clock.start();
 }
 
@@ -41,7 +41,7 @@ void WinScreen::paintEvent(QPaintEvent*) {
     float tcx = (width() - tbw) / 2;
     float titleY = (height() / 2) - 87;
 
-    QRectF winBox(tcx, titleY , tbw, tbh);
+    QRectF winBox(tcx, titleY , tbw, tbh); //Win text banner text box
 
     const int bw = 120;
     const int bh = 28;
@@ -81,7 +81,7 @@ void WinScreen::paintEvent(QPaintEvent*) {
     p.drawText(quitButton,   Qt::AlignCenter, "Quit");
 }
 
-void WinScreen::mousePressEvent(QMouseEvent* event) {
+void WinScreen::mousePressEvent(QMouseEvent* event) { //check for button presses
     {
         QPointF pos = event->localPos();
         if (menuButton.contains(pos)) {
@@ -140,7 +140,7 @@ void WinScreen::initBricks() {
             float x = offsetX + c * (bw + gap);
             float y = offsetY + r * (bh + gap);
 
-            int baseHue = (index * 360) / total;
+            int baseHue = (index * 360) / total; //colors ordered for rainbow effect
 
             Brick b;
             b.rect = QRectF(x, y, bw, bh);
@@ -153,3 +153,4 @@ void WinScreen::initBricks() {
         }
     }
 }
+
