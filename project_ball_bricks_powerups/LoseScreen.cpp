@@ -8,7 +8,7 @@
 
 LoseScreen::LoseScreen(int level, QWidget* parent)
     : QWidget(parent),
-    m_level(level)
+    m_level(level) //allow level input for retryLevel()
 
 {
     setAttribute(Qt::WA_AcceptTouchEvents, true);
@@ -45,7 +45,7 @@ void LoseScreen::paintEvent(QPaintEvent*) {
     float tcx = (width() - tbw) / 2;
     float titleY = (height() / 2) - 87;
 
-    QRectF goBox(tcx, titleY , tbw, tbh);
+    QRectF goBox(tcx, titleY , tbw, tbh); //game over text box
 
     const int bw = 120;
     const int bh = 28;
@@ -88,7 +88,7 @@ void LoseScreen::paintEvent(QPaintEvent*) {
     p.drawText(quitButton,   Qt::AlignCenter, "Quit");
 }
 
-void LoseScreen::mousePressEvent(QMouseEvent* event) {
+void LoseScreen::mousePressEvent(QMouseEvent* event) { //check for button presses
     {
         QPointF pos = event->localPos();
         if (menuButton.contains(pos)) {
@@ -121,7 +121,7 @@ void LoseScreen::onTick() {
         int val = 200 + valOffset;          // 200 → 255
         val = qBound(0, val, 255);          // keep in valid range
 
-        b.color.setHsv(b.baseHue, 255, val);  // keep hue=0 (red), full saturation
+        b.color.setHsv(b.baseHue, 255, val);  // keep hue=0 (red), full saturation, change brightness
     }
 
     update();
@@ -147,7 +147,7 @@ void LoseScreen::initBricks() {
             float x = offsetX + c * (bw + gap);
             float y = offsetY + r * (bh + gap);
 
-            int baseHue = 0;
+            int baseHue = 0; //red color
 
             Brick b;
             b.rect = QRectF(x, y, bw, bh);
@@ -159,3 +159,4 @@ void LoseScreen::initBricks() {
         }
     }
 }
+
